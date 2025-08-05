@@ -5,17 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fietstocht 2025 - Het Vierkantje</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 <body class="bg-gray-100 font-sans leading-relaxed text-gray-800">
 
   <audio id="liedje" src="Fietstocht.mp3"></audio>
-    <button 
-    id="playKnop"
-    class="fixed bottom-4 right-4 z-50 bg-green-700 hover:bg-green-800 text-white p-4 rounded-full shadow-lg"
-    aria-label="Play/Pause"
-  >
-    ▶️
-  </button>
+<button 
+  id="playKnop"
+  class="fixed bottom-4 right-4 z-50 bg-blue-600 hover:bg-blue-700 text-white text-3xl p-4 rounded-full shadow-lg transition flex items-center justify-center"
+  aria-label="Play/Pause"
+>
+  <i id="playIcon" class="bi bi-play-circle-fill"></i>
+</button>
 
   <div class="max-w-4xl mx-auto px-4 py-8">
 
@@ -529,14 +530,17 @@
 
   const audio = document.getElementById('liedje');
   const knop = document.getElementById('playKnop');
+  const icon = document.getElementById('playIcon');
 
   knop.addEventListener('click', () => {
     if (audio.paused) {
       audio.play();
-      knop.textContent = '⏸️';
+      icon.classList.remove('bi-play-circle-fill');
+      icon.classList.add('bi-pause-circle-fill');
     } else {
       audio.pause();
-      knop.textContent = '▶️';
+      icon.classList.remove('bi-pause-circle-fill');
+      icon.classList.add('bi-play-circle-fill');
     }
   });
 
