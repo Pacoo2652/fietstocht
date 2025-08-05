@@ -501,6 +501,26 @@
 </section>
 
 <script>
+let bierCount = 0;
+
+function verhoogBier() {
+  bierCount++;
+  const bierEl = document.getElementById("bierAantal");
+  bierEl.textContent = bierCount;
+
+  // Bounce opnieuw triggeren
+  bierEl.classList.remove("animate-bounce");
+  void bierEl.offsetWidth;
+  bierEl.classList.add("animate-bounce");
+
+  // Plop geluidje
+  const plop = document.getElementById("plopGeluid");
+  if (plop) {
+    plop.currentTime = 0;
+    plop.play();
+  }
+
+  // Reacties bij bepaalde aantallen
   const reacties = {
     1: "Op één been kan je niet lopen! 🍺",
     3: "Ze smaken lekker zo te zien 🍻",
@@ -509,24 +529,6 @@
     10: "Laat die BBQ maar aanrukken, jij bent er klaar voor! 🔥"
   };
 
-  let bierCount = 0;
-
-  function tikBier() {
-  bierCount++;
-  const bierEl = document.getElementById("bierTeller");
-  bierEl.textContent = bierCount;
-
-  // Plopgeluid
-  const plop = document.getElementById("plopGeluid");
-  plop.currentTime = 0;
-  plop.play();
-
-  // Bounce animatie opnieuw starten
-  bierEl.classList.remove("animate-bounce");
-  void bierEl.offsetWidth; // force reflow
-  bierEl.classList.add("animate-bounce");
-
-  // Reactie tonen (indien aanwezig)
   if (reacties[bierCount]) {
     alert(reacties[bierCount]);
   }
@@ -626,11 +628,11 @@ audio.addEventListener('pause', () => {
 
 </script>
 
-<div class="fixed top-4 right-4 z-50 bg-yellow-500 text-white rounded-full shadow-lg flex items-center px-3 py-2 gap-2 w-[72px]">
-  <button onclick="tikBier()" class="text-white text-2xl w-10 h-10 flex items-center justify-center">
-    <i class="bi bi-beer"></i>
+<div id="bierteller" class="fixed top-4 right-4 z-50 bg-yellow-100 text-yellow-900 border border-yellow-300 rounded-full shadow px-4 py-2 text-sm flex items-center gap-2">
+  <span id="bierAantal">0</span> 🍺
+  <button onclick="verhoogBier()" class="text-xs bg-yellow-300 hover:bg-yellow-400 text-yellow-900 font-semibold px-2 py-1 rounded">
+    +1
   </button>
-  <span id="bierTeller" class="text-lg font-bold">0</span>
 </div>
 
 <div class="flex justify-center items-center gap-6 mb-2">
