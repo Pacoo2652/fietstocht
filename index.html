@@ -508,25 +508,25 @@ function verhoogBier() {
   const bierEl = document.getElementById("bierAantal");
   bierEl.textContent = bierCount;
 
-  // Bounce opnieuw triggeren
   bierEl.classList.remove("animate-bounce");
   void bierEl.offsetWidth;
   bierEl.classList.add("animate-bounce");
 
-  // Plop geluidje
   const plop = document.getElementById("plopGeluid");
   if (plop) {
     plop.currentTime = 0;
     plop.play();
   }
 
-  // Reacties bij bepaalde aantallen
   const reacties = {
     1: "Op één been kan je niet lopen! 🍺",
     3: "Ze smaken lekker zo te zien 🍻",
     5: "Je moet ook nog terug hè? 😅",
-    8: "Als je nu nog recht fietst, trakteer je! 🚲",
-    10: "Laat die BBQ maar aanrukken, jij bent er klaar voor! 🔥"
+    8: "Misschien is het tijd voor een glas water? 💧😉",
+    10: "Als je nu nog recht fietst, trakteer je! 🚲",
+    12: "Je glas is voller dan je bandenspanning! 🎈",
+    14: "Niet vergeten: links = water, rechts = sloot 🌊",
+    16: "16 bruine boterhammen, wil jij zo nog wel BBQ-en? 🔥",
   };
 
   if (reacties[bierCount]) {
