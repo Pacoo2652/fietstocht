@@ -501,15 +501,28 @@
 </section>
 
 <script>
-const reacties = {
-  1: "Op één been kan je niet lopen! 🍺",
-  3: "Ze smaken lekker zo te zien 🍻",
-  5: "Je moet ook nog terug hè? 😅",
-  8: "Als je nu nog recht fietst, trakteer je! 🚲",
-  10: "Laat die BBQ maar aanrukken, jij bent er klaar voor! 🔥"
-};
+  const reacties = {
+    1: "Op één been kan je niet lopen! 🍺",
+    3: "Ze smaken lekker zo te zien 🍻",
+    5: "Je moet ook nog terug hè? 😅",
+    8: "Als je nu nog recht fietst, trakteer je! 🚲",
+    10: "Laat die BBQ maar aanrukken, jij bent er klaar voor! 🔥"
+  };
 
+  let bierCount = 0;
 
+  function tikBier() {
+    bierCount++;
+    document.getElementById("bierTeller").textContent = bierCount;
+
+    const plop = document.getElementById("plopGeluid");
+    plop.currentTime = 0;
+    plop.play();
+
+    if (reacties[bierCount]) {
+      alert(reacties[bierCount]);
+    }
+  }
 
   const vragen = [
     "naam",
@@ -608,26 +621,9 @@ bierEl.classList.remove("animate-bounce");
 void bierEl.offsetWidth;
 bierEl.classList.add("animate-bounce");
 
-
-let bierCount = 0;
-
-function tikBier() {
-  bierCount++;
-  document.getElementById("bierTeller").textContent = bierCount;
-
-  const plop = document.getElementById("plopGeluid");
-  plop.currentTime = 0;
-  plop.play();
-
-  if (reacties[bierCount]) {
-    alert(reacties[bierCount]);
-  }
-}
-
-
 </script>
 
-<div class="fixed top-4 right-4 z-50 bg-yellow-500 text-white rounded-full shadow-lg flex items-center px-4 py-2 gap-2 w-fit pr-4 pl-3">
+<div class="fixed top-4 left-4 z-50 bg-yellow-500 text-white rounded-full shadow-lg flex items-center px-4 py-2 gap-2 w-fit pr-4 pl-3">
   <button onclick="tikBier()" class="text-2xl"><i class="bi bi-beer"></i></button>
   <span id="bierTeller" class="text-lg font-bold">0</span>
 </div>
