@@ -26,11 +26,6 @@
 
   <div id="minispeler" class="fixed bottom-4 right-4 z-50 bg-[#1DB954] text-white rounded-full shadow-lg flex items-center px-4 py-2 gap-3 w-[250px] sm:w-[300px]">
   <div class="wave flex items-end gap-[2px]">
-    <div class="bar h-2 w-1 bg-white animate-wave"></div>
-    <div class="bar h-4 w-1 bg-white animate-wave delay-75"></div>
-    <div class="bar h-3 w-1 bg-white animate-wave delay-150"></div>
-    <div class="bar h-5 w-1 bg-white animate-wave delay-[225ms]"></div>
-    <div class="bar h-3 w-1 bg-white animate-wave delay-[300ms]"></div>
   </div>
 
   <div class="flex-1 text-sm font-medium truncate">
@@ -554,29 +549,34 @@
     window.location.href = mailto;
   }
 
-  const audio = document.getElementById('liedje');
-  const knop = document.getElementById('playKnop');
-  const icon = document.getElementById('playIcon');
+const audio = document.getElementById('liedje');
+const knop = document.getElementById('playKnop');
+const icon = document.getElementById('playIcon');
 
-  knop.addEventListener('click', () => {
-    if (audio.paused) {
-      audio.play();
-      icon.classList.remove('bi-play-circle-fill');
-      icon.classList.add('bi-pause-circle-fill');
-    } else {
-      audio.pause();
-      icon.classList.remove('bi-pause-circle-fill');
-      icon.classList.add('bi-play-circle-fill');
-    }
-  });
+knop.addEventListener('click', () => {
+  if (audio.paused) {
+    audio.play();
+    icon.classList.remove('bi-play-circle-fill');
+    icon.classList.add('bi-pause-circle-fill');
+  } else {
+    audio.pause();
+    icon.classList.remove('bi-pause-circle-fill');
+    icon.classList.add('bi-play-circle-fill');
+  }
+});
 
-  // Stop de animatie van de "wave" als audio gepauzeerd is
-  audio.addEventListener('play', () => {
-    document.querySelectorAll('.bar').forEach(el => el.classList.add('animate-wave'));
+audio.addEventListener('play', () => {
+  document.querySelectorAll('.bar').forEach((el, i) => {
+    el.classList.add('animate-wave');
   });
-  audio.addEventListener('pause', () => {
-    document.querySelectorAll('.bar').forEach(el => el.classList.remove('animate-wave'));
+});
+
+audio.addEventListener('pause', () => {
+  document.querySelectorAll('.bar').forEach(el => {
+    el.classList.remove('animate-wave');
   });
+});
+
 
 </script>
 
