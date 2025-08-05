@@ -512,17 +512,25 @@
   let bierCount = 0;
 
   function tikBier() {
-    bierCount++;
-    document.getElementById("bierTeller").textContent = bierCount;
+  bierCount++;
+  const bierEl = document.getElementById("bierTeller");
+  bierEl.textContent = bierCount;
 
-    const plop = document.getElementById("plopGeluid");
-    plop.currentTime = 0;
-    plop.play();
+  // Plopgeluid
+  const plop = document.getElementById("plopGeluid");
+  plop.currentTime = 0;
+  plop.play();
 
-    if (reacties[bierCount]) {
-      alert(reacties[bierCount]);
-    }
+  // Bounce animatie opnieuw starten
+  bierEl.classList.remove("animate-bounce");
+  void bierEl.offsetWidth; // force reflow
+  bierEl.classList.add("animate-bounce");
+
+  // Reactie tonen (indien aanwezig)
+  if (reacties[bierCount]) {
+    alert(reacties[bierCount]);
   }
+}
 
   const vragen = [
     "naam",
@@ -616,18 +624,14 @@ audio.addEventListener('pause', () => {
   });
 });
 
-const bierEl = document.getElementById("bierTeller");
-bierEl.classList.remove("animate-bounce");
-void bierEl.offsetWidth;
-bierEl.classList.add("animate-bounce");
-
 </script>
 
-<div class="fixed top-4 left-4 z-50 bg-yellow-500 text-white rounded-full shadow-lg flex items-center px-4 py-2 gap-2 w-fit pr-4 pl-3">
-  <button onclick="tikBier()" class="text-2xl"><i class="bi bi-beer"></i></button>
+<div class="fixed top-4 right-4 z-50 bg-yellow-500 text-white rounded-full shadow-lg flex items-center px-3 py-2 gap-2 w-[72px]">
+  <button onclick="tikBier()" class="text-white text-2xl w-10 h-10 flex items-center justify-center">
+    <i class="bi bi-beer"></i>
+  </button>
   <span id="bierTeller" class="text-lg font-bold">0</span>
 </div>
-
 
 <div class="flex justify-center items-center gap-6 mb-2">
   <img src="vierkantje.png" alt="'t Vierkantje logo" class="h-6 sm:h-8 object-contain" />
