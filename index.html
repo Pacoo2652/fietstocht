@@ -27,19 +27,16 @@
   animation: bounce 0.5s ease infinite alternate;
 }
 
+#bierTellerBounce {
+  animation: bounce 0.3s ease;
+}
+
+
 </style>
 
 </head>
 
 <body class="bg-gray-100 font-sans leading-relaxed text-gray-800">
-
-<div id="bierteller" class="fixed top-4 right-4 z-50 bg-yellow-100 text-yellow-900 border border-yellow-300 rounded-full shadow px-4 py-2 text-sm flex items-center gap-2">
-<span id="bierAantal">0</span> 🍺
-<button onclick="verhoogBier()" class="text-xs bg-yellow-300 hover:bg-yellow-400 text-yellow-900 font-semibold px-2 py-1 rounded">
-  +1
-</button>
-</div>
-
 
 <div id="minispeler" class="fixed bottom-4 right-4 z-50 bg-[#1DB954] text-white rounded-full shadow-lg flex items-center px-3 py-2 gap-2 w-[88px]">
   <div class="wave flex items-end gap-[2px]">
@@ -56,6 +53,7 @@
 </div>
 
   <audio id="liedje" src="Fietstocht.mp3"></audio>
+  <audio id="plopGeluid" src="openbier.mp3" preload="auto"></audio>
 
   <div class="max-w-4xl mx-auto px-4 py-8">
 
@@ -503,6 +501,16 @@
 </section>
 
 <script>
+const reacties = {
+  1: "Op één been kan je niet lopen! 🍺",
+  3: "Ze smaken lekker zo te zien 🍻",
+  5: "Je moet ook nog terug hè? 😅",
+  8: "Als je nu nog recht fietst, trakteer je! 🚲",
+  10: "Laat die BBQ maar aanrukken, jij bent er klaar voor! 🔥"
+};
+
+
+
   const vragen = [
     "naam",
     ...Array.from({ length: 15 }, (_, i) => `vraag${i + 1}`),
@@ -595,19 +603,35 @@ audio.addEventListener('pause', () => {
   });
 });
 
-function verhoogBier() {
-  let huidige = parseInt(localStorage.getItem("bierteller") || "0");
-  huidige++;
-  localStorage.setItem("bierteller", huidige);
-  document.getElementById("bierAantal").textContent = huidige;
-}
+const bierEl = document.getElementById("bierTeller");
+bierEl.classList.remove("animate-bounce");
+void bierEl.offsetWidth;
+bierEl.classList.add("animate-bounce");
 
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("bierAantal").textContent = localStorage.getItem("bierteller") || "0";
-});
+
+let bierCount = 0;
+
+function tikBier() {
+  bierCount++;
+  document.getElementById("bierTeller").textContent = bierCount;
+
+  const plop = document.getElementById("plopGeluid");
+  plop.currentTime = 0;
+  plop.play();
+
+  if (reacties[bierCount]) {
+    alert(reacties[bierCount]);
+  }
+}
 
 
 </script>
+
+<div class="fixed top-4 right-4 z-50 bg-yellow-500 text-white rounded-full shadow-lg flex items-center px-4 py-2 gap-2 w-fit pr-4 pl-3">
+  <button onclick="tikBier()" class="text-2xl"><i class="bi bi-beer"></i></button>
+  <span id="bierTeller" class="text-lg font-bold">0</span>
+</div>
+
 
 <div class="flex justify-center items-center gap-6 mb-2">
   <img src="vierkantje.png" alt="'t Vierkantje logo" class="h-6 sm:h-8 object-contain" />
