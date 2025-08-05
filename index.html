@@ -393,28 +393,15 @@
 </section>
 
 <section class="bg-white rounded-xl shadow-md p-6 mb-6 border-l-4 border-green-700">
-  <h2 class="text-xl font-semibold text-green-800 mb-4">Klaar?</h2>
-  <p class="mb-4">Wil je je antwoorden inzenden? Klik op een van de onderstaande knoppen.</p>
-  <div class="flex flex-col sm:flex-row gap-4">
-    <button onclick="deelViaWhatsApp()" class="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800">
-      Stuur via WhatsApp
-    </button>
-    <button onclick="deelViaMail()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-      Stuur via E-mail
-    </button>
-  </div>
-</section>
-
-<section class="bg-white rounded-xl shadow-md p-6 mb-6 border-l-4 border-green-700">
   <h2 class="text-xl font-semibold text-green-800 mb-4">Geef je mening over de fietstocht</h2>
 
   <label class="block mb-4">
     <span class="text-sm text-gray-700">📅 Wat is jouw voorkeur voor de volgende editie?</span>
     <select id="poll1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-green-500 focus:border-green-500">
       <option value="">Maak een keuze</option>
-      <option>Begin juli</option>
-      <option>Eind juli</option>
-      <option>Begin augustus</option>
+      <option>Begin Juli</option>
+      <option>Eind Juli</option>
+      <option>Eind Augustus</option>
       <option>Huidige weekend is prima</option>
     </select>
   </label>
@@ -450,6 +437,18 @@
   </label>
 </section>
 
+<section class="bg-white rounded-xl shadow-md p-6 mb-6 border-l-4 border-green-700">
+  <h2 class="text-xl font-semibold text-green-800 mb-4">Klaar?</h2>
+  <p class="mb-4">Wil je je antwoorden inzenden? Klik op een van de onderstaande knoppen.</p>
+  <div class="flex flex-col sm:flex-row gap-4">
+    <button onclick="deelViaWhatsApp()" class="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800">
+      Stuur via WhatsApp
+    </button>
+    <button onclick="deelViaMail()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      Stuur via E-mail
+    </button>
+  </div>
+</section>
 
 <script>
   const vragen = [
