@@ -46,7 +46,7 @@
 
 <section class="bg-white rounded-xl shadow-md p-6 mb-6 border-l-4 border-green-700">
   <ul class="list-disc list-inside mb-4 space-y-1">
-    <li>Fiets link de heuvel op langs Bergschenhoek BV, rechtsoversteken en onder de tunnel door.</li>
+    <li>Fiets links de heuvel op langs Bergschenhoek BV, rechtsoversteken en onder de tunnel door.</li>
     <li>Rotonde rechtdoor op de Bergweg-Zuid in de richting van Hillegersberg.</li>
   </ul>
   <p class="bg-yellow-100 px-3 py-2 rounded-md inline-block"><strong>Vraag 2:</strong> Hoe heette het verzorgingstehuis wat hier rechts van de weg stond?</p>
@@ -405,8 +405,83 @@
   </div>
 </section>
 
+<section class="bg-white rounded-xl shadow-md p-6 mb-6 border-l-4 border-green-700">
+  <h2 class="text-xl font-semibold text-green-800 mb-4">Geef je mening over de fietstocht</h2>
+
+  <label class="block mb-4">
+    <span class="text-sm text-gray-700">📅 Wat is jouw voorkeur voor de volgende editie?</span>
+    <select id="poll1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-green-500 focus:border-green-500">
+      <option value="">Maak een keuze</option>
+      <option>Begin juli</option>
+      <option>Eind juli</option>
+      <option>Begin augustus</option>
+      <option>Huidige weekend is prima</option>
+    </select>
+  </label>
+
+  <label class="block mb-4">
+    <span class="text-sm text-gray-700">🗺️ Hoe vond je de route?</span>
+    <select id="poll2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-green-500 focus:border-green-500">
+      <option value="">Maak een keuze</option>
+      <option>Beter dan verwacht</option>
+      <option>Zoals verwacht</option>
+      <option>Minder leuk dan verwacht</option>
+    </select>
+  </label>
+
+  <label class="block mb-4">
+    <span class="text-sm text-gray-700">🌳 Wat voor soort route heeft je voorkeur?</span>
+    <select id="poll3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-green-500 focus:border-green-500">
+      <option value="">Maak een keuze</option>
+      <option>Door de natuur, landelijke wegen</option>
+      <option>Meer stedelijk, de stad in</option>
+      <option>Mix van beide</option>
+    </select>
+  </label>
+
+  <label class="block mb-4">
+    <span class="text-sm text-gray-700">📏 Hoe vond je de afstand?</span>
+    <select id="poll4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-green-500 focus:border-green-500">
+      <option value="">Maak een keuze</option>
+      <option>Perfect zo</option>
+      <option>Mag best wat langer</option>
+      <option>Iets korter was beter</option>
+    </select>
+  </label>
+</section>
+
+
 <script>
-  const vragen = ["naam", ...Array.from({ length: 15 }, (_, i) => `vraag${i + 1}`)];
+  const vragen = [
+    "naam",
+    ...Array.from({ length: 15 }, (_, i) => `vraag${i + 1}`),
+    "poll1", "poll2", "poll3", "poll4"
+  ];
+
+  const vraagTeksten = {
+    naam: "Naam",
+    vraag1: "Welk dier kom je op de route tegen?",
+    vraag2: "Hoe heette het verzorgingstehuis wat hier rechts van de weg stond?",
+    vraag3: "Hoeveel witte vlaggen hangen hier?",
+    vraag4: "Hoeveel volle badkuipen pompt het gemaal per minuut?",
+    vraag5: "Waar is de autocross?",
+    vraag6: "Wat voor dier staat in de voortuin aan de rechterkant?",
+    vraag7: "Hoe groot is Cetti's zanger?",
+    vraag8: "Wie maken we hier blij?",
+    vraag9: "Wat is hier verboden?",
+    vraag10: "Hoe heet het huis?",
+    vraag11: "Hoe heet de IJsclub?",
+    vraag12: "Wat steekt er hier bovenuit?",
+    vraag13: "Welke collega van het Vierkantje zijn ouders wonen op deze weg?",
+    vraag14: "Je bestelt nr. 153 bij de chinees, wat krijg je?",
+    vraag15: "Noem 3 festivals die hier worden georganiseerd.",
+    poll1: "Zou je liever in juli fietsen dan in augustus?",
+    poll2: "Was de route zoals je had verwacht?",
+    poll3: "Zou je liever een route door de stad of natuur willen?",
+    poll4: "Moet de route volgend jaar korter of langer zijn?"
+  };
+
+
 
   vragen.forEach(id => {
     const input = document.getElementById(id);
@@ -421,22 +496,26 @@
   function deelViaWhatsApp() {
     let tekst = 'Mijn antwoorden voor de Fietstocht 2025:%0A%0A';
     vragen.forEach(id => {
+      const vraag = vraagTeksten[id] || id;
       const value = localStorage.getItem(id) || '-';
-      tekst += `${id}: ${value}%0A`;
+      tekst += `${vraag}: ${value}%0A`;
     });
     const whatsappURL = `https://wa.me/31613635637?text=${tekst}`;
     window.open(whatsappURL, '_blank');
   }
 
-    function deelViaMail() {
+
+  function deelViaMail() {
     let tekst = `Mijn antwoorden voor de Fietstocht 2025:\n\n`;
     vragen.forEach(id => {
-        const value = localStorage.getItem(id) || '-';
-        tekst += `${id}: ${value}\n`;
+      const vraag = vraagTeksten[id] || id;
+      const value = localStorage.getItem(id) || '-';
+      tekst += `${vraag}: ${value}\n`;
     });
     const mailto = `mailto:nyahkolk@gmail.com?subject=Fietstocht 2025 Antwoorden&body=${encodeURIComponent(tekst)}`;
     window.location.href = mailto;
-    }
+  }
+
 
 </script>
 
