@@ -18,11 +18,28 @@
 .delay-150 { animation-delay: 150ms; }
 .delay-\[225ms\] { animation-delay: 225ms; }
 .delay-\[300ms\] { animation-delay: 300ms; }
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+#bierAantal {
+  animation: bounce 0.5s ease infinite alternate;
+}
+
 </style>
 
 </head>
 
 <body class="bg-gray-100 font-sans leading-relaxed text-gray-800">
+
+<div id="bierteller" class="fixed top-4 right-4 z-50 bg-yellow-100 text-yellow-900 border border-yellow-300 rounded-full shadow px-4 py-2 text-sm flex items-center gap-2">
+<span id="bierAantal">0</span> 🍺
+<button onclick="verhoogBier()" class="text-xs bg-yellow-300 hover:bg-yellow-400 text-yellow-900 font-semibold px-2 py-1 rounded">
+  +1
+</button>
+</div>
+
 
 <div id="minispeler" class="fixed bottom-4 right-4 z-50 bg-[#1DB954] text-white rounded-full shadow-lg flex items-center px-3 py-2 gap-2 w-[88px]">
   <div class="wave flex items-end gap-[2px]">
@@ -577,6 +594,18 @@ audio.addEventListener('pause', () => {
     el.classList.remove('animate-wave');
   });
 });
+
+function verhoogBier() {
+  let huidige = parseInt(localStorage.getItem("bierteller") || "0");
+  huidige++;
+  localStorage.setItem("bierteller", huidige);
+  document.getElementById("bierAantal").textContent = huidige;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("bierAantal").textContent = localStorage.getItem("bierteller") || "0";
+});
+
 
 </script>
 
