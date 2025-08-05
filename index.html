@@ -578,17 +578,44 @@ audio.addEventListener('pause', () => {
   });
 });
 
+  let bierTeller = parseInt(localStorage.getItem('bierteller')) || 0;
+  const bierCount = document.getElementById('bierCount');
+
+  function updateTeller() {
+    bierCount.textContent = bierTeller;
+    localStorage.setItem('bierteller', bierTeller);
+  }
+
+  function verhoogBier() {
+    bierTeller++;
+    updateTeller();
+  }
+
+  function verlaagBier() {
+    if (bierTeller > 0) {
+      bierTeller--;
+      updateTeller();
+    }
+  }
+
+  updateTeller();
 
 </script>
 
 <div class="flex justify-center items-center gap-6 mb-2">
-  <img src="immovate.png" alt="Immovate logo" class="h-6 sm:h-8 object-contain" />
   <img src="vierkantje.png" alt="'t Vierkantje logo" class="h-6 sm:h-8 object-contain" />
+  <img src="immovate.png" alt="Immovate logo" class="h-6 sm:h-8 object-contain" />
 </div>
 
 <footer class="text-center text-sm text-gray-500 mt-12">
   © 2025 Het Vierkantje
 </footer>
+</div>
+
+<div id="bierteller" class="fixed bottom-4 left-4 z-50 bg-[#1DB954] text-white rounded-full shadow-lg flex items-center px-4 py-2 gap-3 w-[88px]">
+  <button onclick="verlaagBier()" class="text-white text-xl leading-none">−</button>
+  <div class="text-sm font-semibold" id="bierCount">0</div>
+  <button onclick="verhoogBier()" class="text-white text-xl leading-none">+</button>
 </div>
 
 
