@@ -47,17 +47,22 @@
   <audio id="plopGeluid" src="openbier.mp3" preload="auto"></audio>
 
   <!-- Top Nav -->
-  <header class="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-slate-200">
-    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
-      <img src="logo.png" alt="Fietstocht 2025" class="h-8 w-auto" />
-      <div class="h-6 w-px bg-slate-200"></div>
-      <h1 class="text-lg font-semibold tracking-tight">Fietstocht 2025 – Het Vierkantje</h1>
-      <div class="ms-auto flex items-center gap-3">
-        <button id="resetBtn" class="hidden sm:inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-1.5 text-sm hover:bg-slate-50 active:scale-[.99]">
-          <i class="bi-arrow-counterclockwise"></i> Reset antwoorden
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-3 py-2.5 flex items-center gap-2">
+      <!-- Logo perfectly aligned on mobile -->
+      <img src="logo.png" alt="Fietstocht 2025" class="h-8 w-auto object-contain sm:h-10" />
+      <div class="h-6 w-px bg-slate-200 hidden xs:block"></div>
+      <!-- Title kept compact on mobile -->
+      <h1 class="text-base sm:text-lg font-semibold tracking-tight leading-tight whitespace-nowrap">Fietstocht 2025 – Het Vierkantje</h1>
+      <div class="ms-auto flex items-center gap-2">
+        <button id="resetBtn" class="hidden sm:inline-flex h-9 items-center gap-2 rounded-full border border-slate-200 px-3 text-sm hover:bg-slate-50 active:scale-[.99]">
+          <i class="bi-arrow-counterclockwise"></i>
+          <span class="hidden md:inline">Reset antwoorden</span>
+          <span class="md:hidden">Reset</span>
         </button>
-        <a href="#verzenden" class="inline-flex items-center gap-2 rounded-lg bg-emerald-700 text-white px-3.5 py-1.5 text-sm font-medium shadow hover:bg-emerald-800 active:scale-[.99]">
-          <i class="bi-send"></i> Verzenden
+        <a href="#verzenden" class="inline-flex h-9 items-center gap-2 rounded-full bg-emerald-700 text-white px-3.5 text-sm font-medium shadow hover:bg-emerald-800 active:scale-[.99]">
+          <i class="bi-send"></i>
+          <span>Verzenden</span>
         </a>
       </div>
     </div>
