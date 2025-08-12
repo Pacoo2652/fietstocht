@@ -2,198 +2,215 @@
 <html lang="nl" class="scroll-smooth">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Fietstocht 2025 – Het Vierkantje</title>
-  <meta name="theme-color" content="#14532d" />
+  <meta name="theme-color" content="#14532d" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0b1b14" media="(prefers-color-scheme: dark)" />
+  <meta name="color-scheme" content="light dark" />
+  
+  <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>tailwind.config = { darkMode: 'class' };</script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
   <style>
-    html { -webkit-tap-highlight-color: transparent; }
-    body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu, Cantarell, Helvetica Neue, Arial }
-    .fade-in { animation: fade-in .35s ease both }
-    @keyframes fade-in { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-    .pro-input:focus { box-shadow: 0 0 0 4px rgba(16,185,129,.15) }
-    .dark .pro-input { background: #0b1220; border-color: #334155; color: #e5e7eb }
-    .dark .pro-input::placeholder { color:#94a3b8 }
+    :root { --ease: cubic-bezier(.2,.7,.2,1); }
+    body { font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu, Cantarell, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji"; }
+
+    /* Subtle in/out */
+    .fade-in { animation: fade-in .3s var(--ease) both; }
+    @keyframes fade-in { from { opacity: 0; transform: translateY(6px)} to { opacity: 1; transform: translateY(0)} }
+
+    /* Inputs */
+    .pro-input:focus { box-shadow: 0 0 0 4px rgba(16,185,129,.18) } /* emerald-500 */
+
+    /* Toast */
+    .toast-enter { animation: toast-in .25s var(--ease) both; }
+    @keyframes toast-in { from { opacity: 0; transform: translateY(6px)} to { opacity: 1; transform: translateY(0)} }
+
+    /* Dialog blur */
+    [data-dialog-backdrop] { backdrop-filter: blur(2px); }
+
+    /* Beer bounce */
     @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
     #bierAantal { animation: bounce .6s ease infinite alternate }
+
+    /* Equal image aspect */
     .img-card { aspect-ratio: 16/9; object-fit: cover }
+
+    /* Decorative gradient */
     .hero-bg {
-      background: radial-gradient(1200px 480px at 10% -10%, rgba(16,185,129,.15), transparent),
-                  radial-gradient(800px 480px at 110% 10%, rgba(5,150,105,.12), transparent);
+      background:
+        radial-gradient(1200px 420px at 10% -10%, rgba(16,185,129,.14), transparent),
+        radial-gradient(900px 440px at 110% 10%, rgba(5,150,105,.12), transparent);
     }
-    .dark .hero-bg { background: radial-gradient(1000px 420px at 0% -20%, rgba(16,185,129,.15), transparent), radial-gradient(700px 420px at 110% 0%, rgba(5,150,105,.12), transparent) }
+    .dark .hero-bg {
+      background:
+        radial-gradient(1200px 420px at 10% -10%, rgba(16,185,129,.18), transparent),
+        radial-gradient(900px 440px at 110% 10%, rgba(16,185,129,.12), transparent);
+    }
   </style>
+
   <script>
-    // Set theme before paint (prevents FOUC)
-    (function(){
-      const stored = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (stored === 'dark' || (!stored && prefersDark)) document.documentElement.classList.add('dark');
+    // ===== Theme (dark mode) =====
+    (function initTheme(){
+      try {
+        const saved = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = saved ? (saved === 'dark') : prefersDark;
+        document.documentElement.classList.toggle('dark', isDark);
+      } catch(e) {}
     })();
   </script>
 </head>
 <body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100">
+  <!-- Audio assets -->
   <audio id="plopGeluid" src="openbier.mp3" preload="auto"></audio>
 
-  <!-- Header -->
+  <!-- Top Nav (mobile-first) -->
   <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/80 backdrop-blur border-b border-slate-200 dark:border-slate-800">
-    <div class="max-w-6xl mx-auto px-3 py-2.5 flex items-center gap-2">
-      <img src="logo.png" alt="Fietstocht 2025" class="h-8 w-auto object-contain sm:h-10" />
-      <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
-      <h1 class="text-base sm:text-lg font-semibold tracking-tight leading-tight whitespace-nowrap">Fietstocht 2025 – Het Vierkantje</h1>
-      <div class="ms-auto flex items-center gap-2">
-        <button id="themeToggle" class="inline-flex h-9 items-center gap-2 rounded-full border border-slate-200 dark:border-slate-700 px-3 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-[.99]" aria-label="Schakel thema">
-          <i class="bi-moon-stars"></i><span class="hidden sm:inline">Thema</span>
+    <div class="max-w-6xl mx-auto px-3 py-2.5 flex items-center gap-3">
+      <!-- Swapped: show vierkantje.png as the top-left brand mark -->
+      <img src="vierkantje.png" alt="'t Vierkantje" class="h-9 w-auto object-contain" />
+      <div class="h-6 w-px bg-slate-200 dark:bg-slate-700 hidden xs:block"></div>
+      <h1 class="text-base sm:text-lg font-semibold tracking-tight leading-tight">Fietstocht 2025</h1>
+      <div class="ms-auto flex items-center gap-1.5">
+        <button id="themeToggle" class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-[.98]" aria-label="Schakel donker thema">
+          <i class="bi-moon-stars text-lg hidden dark:inline"></i>
+          <i class="bi-brightness-high text-lg dark:hidden"></i>
         </button>
-        <button id="resetBtn" class="hidden sm:inline-flex h-9 items-center gap-2 rounded-full border border-slate-200 dark:border-slate-700 px-3 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-[.99]">
+        <button id="resetBtn" class="hidden sm:inline-flex h-9 items-center gap-2 rounded-full border border-slate-200 dark:border-slate-700 px-3 text-sm hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-[.98]">
           <i class="bi-arrow-counterclockwise"></i>
           <span class="hidden md:inline">Reset antwoorden</span>
           <span class="md:hidden">Reset</span>
         </button>
-        <a href="#verzenden" class="inline-flex h-9 items-center gap-2 rounded-full bg-emerald-700 text-white px-3.5 text-sm font-medium shadow hover:bg-emerald-800 active:scale-[.99]">
+        <a href="#verzenden" class="inline-flex h-9 items-center gap-2 rounded-full bg-emerald-700 text-white px-3.5 text-sm font-medium shadow hover:bg-emerald-800 active:scale-[.98]">
           <i class="bi-send"></i>
           <span>Verzenden</span>
         </a>
       </div>
     </div>
-    <div class="h-1 bg-slate-200/70 dark:bg-slate-800/70">
-      <div id="progressBar" class="h-full w-0 bg-emerald-600 transition-[width] duration-300"></div>
-    </div>
   </header>
 
   <!-- Hero -->
   <section class="hero-bg border-b border-slate-200/60 dark:border-slate-800/60 bg-white dark:bg-slate-900">
-    <div class="max-w-6xl mx-auto px-4 py-8 grid md:grid-cols-[1.1fr_.9fr] gap-8 items-center">
+    <div class="max-w-6xl mx-auto px-4 py-8 grid md:grid-cols-[1.1fr_.9fr] gap-6 items-center">
       <div class="fade-in">
-        <p class="text-sm uppercase tracking-wider text-emerald-700 font-semibold">Welkom, sportieve helden</p>
-        <h2 class="mt-2 text-3xl md:text-4xl font-semibold leading-tight text-slate-900 dark:text-white">Samen de polders door, daarna <span class="text-emerald-700">BBQ & live muziek</span></h2>
+        <p class="text-xs uppercase tracking-wider text-emerald-700 dark:text-emerald-400 font-semibold">Welkom, sportieve helden</p>
+        <h2 class="mt-2 text-2xl md:text-4xl font-semibold leading-tight text-slate-900 dark:text-white">Samen de polders door, daarna <span class="text-emerald-700 dark:text-emerald-400">BBQ & live muziek</span></h2>
         <p class="mt-3 text-slate-600 dark:text-slate-300 max-w-prose">Geniet van de route, neem je tijd en stop waar je wilt. Zorg dat je tussen <strong>16:00 en 17:00</strong> terug bent – om 17:00 starten we op het terras met live muziek en BBQ. Veel plezier! 🍻🚲🌞🎶</p>
         <div class="mt-5 flex items-center gap-3">
-          <a href="#wie-ben-jij" class="inline-flex items-center gap-2 rounded-lg bg-emerald-700 text-white px-4 py-2 font-medium shadow hover:bg-emerald-800">
-            <i class="bi-pencil-square"></i> Start met invullen
-          </a>
-          <button id="scrollTop" class="inline-flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 px-4 py-2 font-medium hover:bg-slate-50 dark:hover:bg-slate-800">
-            <i class="bi-arrow-up"></i> Naar boven
-          </button>
+          <a href="#wie-ben-jij" class="inline-flex items-center gap-2 rounded-lg bg-emerald-700 text-white px-4 py-2 font-medium shadow hover:bg-emerald-800"><i class="bi-pencil-square"></i> Start met invullen</a>
+          <button id="scrollTop" class="inline-flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 px-4 py-2 font-medium hover:bg-slate-50 dark:hover:bg-slate-800"><i class="bi-arrow-up"></i> Naar boven</button>
         </div>
       </div>
       <div class="relative">
-        <img src="vierkantje.png" alt="'t Vierkantje" class="img-card w-full rounded-xl shadow border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"/>
+        <!-- Swapped: show logo.png in the hero visual card -->
+        <img src="logo.png" alt="Fietstocht 2025 logo" class="img-card w-full rounded-xl shadow border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900"/>
         <div class="absolute -bottom-4 -right-4 bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 shadow rounded-xl px-4 py-3 flex items-center gap-3">
           <img src="immovate.png" class="h-6 w-auto" alt="Immovate"/>
-          <span class="text-xs text-slate-500 dark:text-slate-400">Mede mogelijk gemaakt door Immovate</span>
+          <span class="text-xs text-slate-600 dark:text-slate-300">Mede mogelijk gemaakt door Immovate</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Main -->
+  <!-- Main layout -->
   <main class="max-w-6xl mx-auto px-4 py-8 grid lg:grid-cols-[290px_1fr] gap-8">
+    <!-- Sidebar -->
     <aside class="lg:sticky lg:top-20 self-start">
-      <div class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm">
-        <div class="p-5 border-b border-slate-200 dark:border-slate-700">
+      <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
+        <div class="p-5 border-b border-slate-200 dark:border-slate-800">
           <p class="text-sm font-semibold text-slate-900 dark:text-white">Overzicht</p>
           <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Snel naar een onderdeel</p>
         </div>
         <nav class="p-2">
-          <a href="#wie-ben-jij" class="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/40">
-            <span class="size-2 rounded-full bg-emerald-600"></span>
-            <span class="text-sm">Wie ben jij?</span>
-          </a>
-          <a href="#route" class="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/40">
-            <span class="size-2 rounded-full bg-emerald-600"></span>
-            <span class="text-sm">Route & Vragen (1–15)</span>
-          </a>
-          <a href="#stops" class="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/40">
-            <span class="size-2 rounded-full bg-emerald-600"></span>
-            <span class="text-sm">Gezellige stops</span>
-          </a>
-          <a href="#polls" class="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/40">
-            <span class="size-2 rounded-full bg-emerald-600"></span>
-            <span class="text-sm">Mini‑enquête</span>
-          </a>
-          <a href="#verzenden" class="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/40">
-            <span class="size-2 rounded-full bg-emerald-600"></span>
-            <span class="text-sm">Verzenden</span>
-          </a>
+          <a href="#wie-ben-jij" class="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800"><span class="size-2 rounded-full bg-emerald-600"></span><span class="text-sm">Wie ben jij?</span></a>
+          <a href="#route" class="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800"><span class="size-2 rounded-full bg-emerald-600"></span><span class="text-sm">Route & Vragen (1–15)</span></a>
+          <a href="#stops" class="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800"><span class="size-2 rounded-full bg-emerald-600"></span><span class="text-sm">Gezellige stops</span></a>
+          <a href="#polls" class="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800"><span class="size-2 rounded-full bg-emerald-600"></span><span class="text-sm">Mini‑enquête</span></a>
+          <a href="#verzenden" class="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800"><span class="size-2 rounded-full bg-emerald-600"></span><span class="text-sm">Verzenden</span></a>
         </nav>
       </div>
 
-      <div class="mt-6 rounded-2xl border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 shadow-sm">
+      <!-- Beer counter card -->
+      <div class="mt-6 rounded-2xl border border-amber-300 dark:border-amber-900 bg-amber-50 dark:bg-amber-900/30 text-amber-900 dark:text-amber-200 shadow-sm">
         <div class="p-4 flex items-center gap-3">
           <i class="bi-cup-straw text-lg"></i>
           <div>
             <p class="text-sm font-semibold">Bierteller</p>
-            <p class="text-xs text-amber-800/80 dark:text-amber-300/70">Houd het gezellig (en veilig) 🍺</p>
+            <p class="text-xs text-amber-800/80 dark:text-amber-200/80">Houd het gezellig (en veilig) 🍺</p>
           </div>
         </div>
         <div class="px-4 pb-4 flex items-center gap-3">
-          <span id="bierAantal" class="inline-flex items-center justify-center rounded-full bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-700 shadow w-10 h-10 text-sm font-semibold">0</span>
-          <button id="bierPlus" class="inline-flex items-center gap-2 rounded-full bg-amber-300 hover:bg-amber-400 text-amber-900 px-3 py-1.5 text-sm font-semibold active:scale-[.99]"><i class="bi-plus"></i> +1</button>
+          <span id="bierAantal" class="inline-flex items-center justify-center rounded-full bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-800 shadow w-10 h-10 text-sm font-semibold">0</span>
+          <button id="bierPlus" class="inline-flex items-center gap-2 rounded-full bg-amber-300 hover:bg-amber-400 text-amber-900 px-3 py-1.5 text-sm font-semibold active:scale-[.99] dark:text-amber-900"> <i class="bi-plus"></i> +1</button>
         </div>
       </div>
     </aside>
 
     <!-- Content -->
     <section class="space-y-8" id="content">
-      <div class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm fade-in">
-        <h3 class="text-xl font-semibold text-emerald-800">Welkom bij de Fietstocht van het Vierkantje!</h3>
+      <!-- Intro -->
+      <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm fade-in">
+        <h3 class="text-xl font-semibold text-emerald-800 dark:text-emerald-400">Welkom bij de Fietstocht van het Vierkantje!</h3>
         <p class="mt-2 text-slate-600 dark:text-slate-300">Vandaag stappen we samen op de fiets voor een ouderwetse tocht met veel gezellige stops. Voel je vrij om elders te pauzeren en te genieten. Zorg wel dat je tussen <strong>16:00 en 17:00</strong> terug bent: om 17:00 starten we met <strong>live muziek</strong> en BBQ.</p>
       </div>
 
-      <div id="wie-ben-jij" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
-        <h3 class="text-lg font-semibold text-emerald-800">Wie ben jij?</h3>
+      <!-- Who are you -->
+      <div id="wie-ben-jij" class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+        <h3 class="text-lg font-semibold text-emerald-800 dark:text-emerald-400">Wie ben jij?</h3>
         <label class="block mt-3 text-sm">Naam
-          <input id="naam" name="naam" type="text" placeholder="Typ hier je naam" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 focus:outline-none" />
+          <input id="naam" name="naam" type="text" placeholder="Typ hier je naam" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none" />
         </label>
       </div>
 
+      <!-- Route & questions -->
       <div id="route" class="space-y-6">
-        <article class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
-          <h4 class="font-semibold text-emerald-800">Start</h4>
+        <!-- Q1-->
+        <article class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+          <h4 class="font-semibold text-emerald-800 dark:text-emerald-400">Start</h4>
           <ul class="list-disc ms-5 mt-2 text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li>Vertrek op Herenstraat, langs Slagerij de Rooy.</li>
             <li>Sla op de rotonde linksaf richting Bergschenhoek.</li>
             <li>Volg de Boterdorpseweg en ga 3 rotondes rechtdoor.</li>
           </ul>
-          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-700 text-amber-900 dark:text-amber-200 px-3 py-1.5 rounded"> <strong>Vraag 1:</strong> Welk dier kom je op de route tegen?</p>
+          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100 px-3 py-1.5 rounded"> <strong>Vraag 1:</strong> Welk dier kom je op de route tegen?</p>
           <label class="block mt-3 text-sm">Jouw antwoord
-            <input id="vraag1" name="vraag1" type="text" placeholder="Typ hier je antwoord" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 focus:outline-none" />
+            <input id="vraag1" name="vraag1" type="text" placeholder="Typ hier je antwoord" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none" />
           </label>
         </article>
 
-        <!-- Q2 -->
-        <article class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
+        <!-- Q2-->
+        <article class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
           <ul class="list-disc ms-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li>Fiets links de heuvel op langs Bergschenhoek BV, rechtsoversteken en onder de tunnel door.</li>
             <li>Rotonde rechtdoor op de Bergweg-Zuid in de richting van Hillegersberg.</li>
           </ul>
-          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-700 text-amber-900 dark:text-amber-200 px-3 py-1.5 rounded"> <strong>Vraag 2:</strong> Hoe heette het verzorgingstehuis wat hier rechts van de weg stond?</p>
+          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100 px-3 py-1.5 rounded"> <strong>Vraag 2:</strong> Hoe heette het verzorgingstehuis wat hier rechts van de weg stond?</p>
           <label class="block mt-3 text-sm">Jouw antwoord
-            <input id="vraag2" name="vraag2" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
+            <input id="vraag2" name="vraag2" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
           </label>
         </article>
 
-        <!-- Q3 -->
-        <article class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
+        <!-- Q3-->
+        <article class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
           <ul class="list-disc ms-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li>Sla linksaf de Bosweg in.</li>
             <li>Neem het eerste fietspad links.</li>
             <li>Ga voor Horsecenter Pirouette rechtsaf het Runderpad op.</li>
           </ul>
-          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-700 text-amber-900 dark:text-amber-200 px-3 py-1.5 rounded"> <strong>Vraag 3:</strong> Hoeveel witte vlaggen hangen hier?</p>
+          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100 px-3 py-1.5 rounded"> <strong>Vraag 3:</strong> Hoeveel witte vlaggen hangen hier?</p>
           <label class="block mt-3 text-sm">Jouw antwoord
-            <input id="vraag3" name="vraag3" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
+            <input id="vraag3" name="vraag3" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
           </label>
         </article>
 
-        <!-- Stop + Q4 -->
-        <article class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm" id="stops">
-          <div class="rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 p-4 text-emerald-900 dark:text-emerald-200">
+        <!-- Stop: Bergsche Plas + Q4 -->
+        <article class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm" id="stops">
+          <div class="rounded-xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-900/20 p-4 text-emerald-900 dark:text-emerald-200">
             <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
               <img src="bergscheplas.jpg" alt="Bergsche Plas" class="img-card w-full sm:w-56 rounded-md border border-emerald-200 dark:border-emerald-800 shadow"/>
               <div class="flex-1">
@@ -208,47 +225,46 @@
             <li>Bovenaan het fietspad linksaf.</li>
             <li>Einde fietspad de weg oversteken Vaandragerdreef op.</li>
           </ul>
-          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-700 text-amber-900 dark:text-amber-200 px-3 py-1.5 rounded"> <strong>Vraag 4:</strong> Hoeveel volle badkuipen pompt het gemaal per minuut?</p>
+          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100 px-3 py-1.5 rounded"> <strong>Vraag 4:</strong> Hoeveel volle badkuipen pompt het gemaal per minuut?</p>
           <label class="block mt-3 text-sm">Jouw antwoord
-            <input id="vraag4" name="vraag4" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
+            <input id="vraag4" name="vraag4" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
           </label>
         </article>
 
-        <!-- For brevity the rest of Q5..Q15 + stops follow the same structure and classes as in the previous version -->
         <!-- Q5 -->
-        <article class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
+        <article class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
           <ul class="list-disc ms-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li>Na café Oud Verlaat, rechtsaf naar beneden Vlietkade op.</li>
           </ul>
-          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-700 text-amber-900 dark:text-amber-200 px-3 py-1.5 rounded"><strong>Vraag 5:</strong> Waar is de autocross?</p>
+          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100 px-3 py-1.5 rounded"><strong>Vraag 5:</strong> Waar is de autocross?</p>
           <label class="block mt-3 text-sm">Jouw antwoord
-            <input id="vraag5" name="vraag5" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
+            <input id="vraag5" name="vraag5" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
           </label>
         </article>
 
-        <!-- Q6 + Lookies -->
-        <article class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
+        <!-- Q6 -->
+        <article class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
           <ul class="list-disc ms-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li>Vervolg op de Vlietkade tot aan de kruising met de Nesseweg.</li>
             <li>Ga op de kruising linksaf richting Zevenhuizen.</li>
             <li>Rechtsaf fietspad op richting Nieuwerkerk aan de IJssel.</li>
           </ul>
-          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-700 text-amber-900 dark:text-amber-200 px-3 py-1.5 rounded"><strong>Vraag 6:</strong> Wat voor dier staat erin de voortuin aan de rechterkant?</p>
+          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100 px-3 py-1.5 rounded"><strong>Vraag 6:</strong> Wat voor dier staat erin de voortuin aan de rechterkant?</p>
           <label class="block mt-3 text-sm">Jouw antwoord
-            <input id="vraag6" name="vraag6" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
+            <input id="vraag6" name="vraag6" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
           </label>
         </article>
 
         <!-- Q7 -->
-        <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <ul class="list-disc ms-5 text-sm text-slate-700 space-y-1">
+        <article class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+          <ul class="list-disc ms-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li>Sla linksaf richting de volleybal velden het Jacques de Graaffpad op.</li>
             <li>Einde fietspad rechtsaf langs de volleybal velden.</li>
             <li>Ga linksaf fietspad op langs de Siciliëboulevard. Houdt water aan de linkerhand.</li>
           </ul>
-          <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-900 mt-3">
+          <div class="rounded-xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-900/20 p-4 text-emerald-900 dark:text-emerald-200 mt-3">
             <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-              <img src="lookies.jpg" alt="Brasserie Lookies" class="img-card w-full sm:w-56 rounded-md border border-emerald-200 shadow"/>
+              <img src="lookies.jpg" alt="Brasserie Lookies" class="img-card w-full sm:w-56 rounded-md border border-emerald-200 dark:border-emerald-800 shadow"/>
               <div class="flex-1">
                 <h5 class="font-semibold">Brasserie Lookies</h5>
                 <p class="text-sm">Gezellig aan het strand van Nesselande ☕ ⭐ 4,1 (1.234 reviews)</p>
@@ -256,26 +272,26 @@
               </div>
             </div>
           </div>
-          <ul class="list-disc ms-5 mt-4 text-sm text-slate-700 space-y-1">
+          <ul class="list-disc ms-5 mt-4 text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li>Sla linksaf en vervolg weg over Pleun van der Zijdedijk.</li>
             <li>Sla linksaf 010 fietspad op bij zwartplaatje met nummer 44 (Adriaan Huysmanpad).</li>
           </ul>
-          <p class="inline-block mt-4 bg-amber-50 border border-amber-200 text-amber-900 px-3 py-1.5 rounded"><strong>Vraag 7:</strong> Hoe groot is Cetti's zanger?</p>
+          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100 px-3 py-1.5 rounded"><strong>Vraag 7:</strong> Hoe groot is Cetti's zanger?</p>
           <label class="block mt-3 text-sm">Jouw antwoord
-            <input id="vraag7" name="vraag7" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
+            <input id="vraag7" name="vraag7" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
           </label>
         </article>
 
         <!-- Q8 + Pannekoe stop -->
-        <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <ul class="list-disc ms-5 text-sm text-slate-700 space-y-1">
+        <article class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+          <ul class="list-disc ms-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li>Voor de witte brug linksaf, en vervolg op Adriaan Huysmanpad</li>
             <li>Als je wilt stoppen, ga op kruising linksaf naar Pannekoe.</li>
             <li>Anders rechtsaf strandweg op en fiets weer richting de Rotte</li>
           </ul>
-          <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-900 mt-3">
+          <div class="rounded-xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-900/20 p-4 text-emerald-900 dark:text-emerald-200 mt-3">
             <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-              <img src="pannekoe.jpg" alt="De Pannekoe Zevenhuizen" class="img-card w-full sm:w-56 rounded-md border border-emerald-200 shadow"/>
+              <img src="pannekoe.jpg" alt="De Pannekoe Zevenhuizen" class="img-card w-full sm:w-56 rounded-md border border-emerald-200 dark:border-emerald-800 shadow"/>
               <div class="flex-1">
                 <h5 class="font-semibold">De Pannekoe (Zevenhuizen)</h5>
                 <p class="text-sm">Gezellig pannenkoekenrestaurant met terras en uitzicht. ⭐ 4,2 (292 reviews)</p>
@@ -283,37 +299,37 @@
               </div>
             </div>
           </div>
-          <ul class="list-disc ms-5 mt-4 text-sm text-slate-700 space-y-1">
+          <ul class="list-disc ms-5 mt-4 text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li>Ga rechtsaf de Rottekade op richting Zevenhuizen.</li>
           </ul>
-          <p class="inline-block mt-4 bg-amber-50 border border-amber-200 text-amber-900 px-3 py-1.5 rounded"><strong>Vraag 8:</strong> Wie maken we hier blij?</p>
+          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100 px-3 py-1.5 rounded"><strong>Vraag 8:</strong> Wie maken we hier blij?</p>
           <label class="block mt-3 text-sm">Jouw antwoord
-            <input id="vraag8" name="vraag8" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
+            <input id="vraag8" name="vraag8" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
           </label>
-          <ul class="list-disc ms-5 mt-4 text-sm text-slate-700 space-y-1">
+          <ul class="list-disc ms-5 mt-4 text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li>Vervolg op de Rottekade tot aan de Pekhuisbrug.</li>
             <li>Ga linksaf deze blauwe brug over.</li>
           </ul>
-          <p class="inline-block mt-4 bg-amber-50 border border-amber-200 text-amber-900 px-3 py-1.5 rounded"><strong>Vraag 9:</strong> Wat is hier verboden?</p>
+          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100 px-3 py-1.5 rounded"><strong>Vraag 9:</strong> Wat is hier verboden?</p>
           <label class="block mt-3 text-sm">Jouw antwoord
-            <input id="vraag9" name="vraag9" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
+            <input id="vraag9" name="vraag9" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
           </label>
         </article>
 
         <!-- Q10 + Dagcamping stop -->
-        <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <ul class="list-disc ms-5 text-sm text-slate-700 space-y-1">
+        <article class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+          <ul class="list-disc ms-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li>Brug over, rechtsaf. vervolg fietspad langs het water. Hou het water aan de rechterkant.</li>
             <li>Vervolg voorlopig op Rottedijk.</li>
             <li>Sla gelijk na het Meerenbos linksaf de Lange Vaart op.</li>
           </ul>
-          <p class="inline-block mt-4 bg-amber-50 border border-amber-200 text-amber-900 px-3 py-1.5 rounded"><strong>Vraag 10:</strong> Hoe heet het huis?</p>
+          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100 px-3 py-1.5 rounded"><strong>Vraag 10:</strong> Hoe heet het huis?</p>
           <label class="block mt-3 text-sm">Jouw antwoord
-            <input id="vraag10" name="vraag10" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
+            <input id="vraag10" name="vraag10" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
           </label>
-          <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-900 mt-4">
+          <div class="rounded-xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-900/20 p-4 text-emerald-900 dark:text-emerald-200 mt-4">
             <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-              <img src="dagcamping.png" alt="Dagcamping bij de kanovijver" class="img-card w-full sm:w-56 rounded-md border border-emerald-200 shadow"/>
+              <img src="dagcamping.png" alt="Dagcamping bij de kanovijver" class="img-card w-full sm:w-56 rounded-md border border-emerald-200 dark:border-emerald-800 shadow"/>
               <div class="flex-1">
                 <h5 class="font-semibold">Stop 2 – Dagcamping</h5>
                 <p class="text-sm">Tijd om even uit te rusten! Geniet hier van iets fris en gezelligheid aan het water. 🌞🍉</p>
@@ -323,18 +339,18 @@
         </article>
 
         <!-- Q11 + Jofel stop later -->
-        <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <ul class="list-disc ms-5 text-sm text-slate-700 space-y-1">
+        <article class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+          <ul class="list-disc ms-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li>Rij terug richting de dijk (Lange Vaart).</li>
             <li>Linksaf richting IJsclub Bleiswijk.</li>
           </ul>
-          <p class="inline-block mt-4 bg-amber-50 border border-amber-200 text-amber-900 px-3 py-1.5 rounded"><strong>Vraag 11:</strong> Hoe heet de IJsclub?</p>
+          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100 px-3 py-1.5 rounded"><strong>Vraag 11:</strong> Hoe heet de IJsclub?</p>
           <label class="block mt-3 text-sm">Jouw antwoord
-            <input id="vraag11" name="vraag11" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
+            <input id="vraag11" name="vraag11" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
           </label>
-          <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-900 mt-4">
+          <div class="rounded-xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-900/20 p-4 text-emerald-900 dark:text-emerald-200 mt-4">
             <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-              <img src="jofel.jpg" alt="Jofel Bleiswijk" class="img-card w-full sm:w-56 rounded-md border border-emerald-200 shadow"/>
+              <img src="jofel.jpg" alt="Jofel Bleiswijk" class="img-card w-full sm:w-56 rounded-md border border-emerald-200 dark:border-emerald-800 shadow"/>
               <div class="flex-1">
                 <h5 class="font-semibold">Jofel (Bleiswijk)</h5>
                 <p class="text-sm">Gezellige lunchroom met terras midden in het centrum van Bleiswijk. ⭐ 4,4 (643 reviews)</p>
@@ -345,47 +361,47 @@
         </article>
 
         <!-- Q12 -->
-        <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <ul class="list-disc ms-5 text-sm text-slate-700 space-y-1">
+        <article class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+          <ul class="list-disc ms-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li>Fiets verder over De dorpstraat en Hoekeindseweg.</li>
             <li>Over fietspad rechtdoor langs Blesewic.</li>
             <li>Rechtsaf richting stoplichten/ Kruispunt N209.</li>
             <li>Na de stoplichten linksaf richting tankstation.</li>
             <li>Rijd langs de Argos over de Hoekeindseweg richting Bergschenhoek dorp.</li>
           </ul>
-          <p class="inline-block mt-4 bg-amber-50 border border-amber-200 text-amber-900 px-3 py-1.5 rounded"><strong>Vraag 12:</strong> Wat steekt er hier bovenuit?</p>
+          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100 px-3 py-1.5 rounded"><strong>Vraag 12:</strong> Wat steekt er hier bovenuit?</p>
           <label class="block mt-3 text-sm">Jouw antwoord
-            <input id="vraag12" name="vraag12" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
+            <input id="vraag12" name="vraag12" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
           </label>
         </article>
 
         <!-- Q13 + Q14 -->
-        <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <ul class="list-disc ms-5 text-sm text-slate-700 space-y-1">
+        <article class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+          <ul class="list-disc ms-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li>Bij stoplicht rechtsaf en vervolg weg op Oosteindseweg.</li>
           </ul>
-          <p class="inline-block mt-4 bg-amber-50 border border-amber-200 text-amber-900 px-3 py-1.5 rounded"><strong>Vraag 13:</strong> Welke collega van het Vierkantje zijn ouders wonen op deze weg?</p>
+          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100 px-3 py-1.5 rounded"><strong>Vraag 13:</strong> Welke collega van het Vierkantje zijn ouders wonen op deze weg?</p>
           <label class="block mt-3 text-sm">Jouw antwoord
-            <input id="vraag13" name="vraag13" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
+            <input id="vraag13" name="vraag13" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
           </label>
-          <ul class="list-disc ms-5 mt-4 text-sm text-slate-700 space-y-1">
+          <ul class="list-disc ms-5 mt-4 text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li>Op de rotonde rechtdoor richting Bergschenhoek dorp.</li>
           </ul>
-          <p class="inline-block mt-4 bg-amber-50 border border-amber-200 text-amber-900 px-3 py-1.5 rounded"><strong>Vraag 14:</strong> Je bestelt nr. 153 bij de chinees, wat krijg je?</p>
+          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100 px-3 py-1.5 rounded"><strong>Vraag 14:</strong> Je bestelt nr. 153 bij de chinees, wat krijg je?</p>
           <label class="block mt-3 text-sm">Jouw antwoord
-            <input id="vraag14" name="vraag14" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
+            <input id="vraag14" name="vraag14" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
           </label>
         </article>
 
         <!-- Q15 + Tries stop -->
-        <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <ul class="list-disc ms-5 text-sm text-slate-700 space-y-1">
+        <article class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+          <ul class="list-disc ms-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li>Voor het dorp rechtsaf op het Rondom langs parkeerplaats Jumbo.</li>
             <li>Mocht je willen stoppen, vervolg dan straks vanaf hier de route.</li>
           </ul>
-          <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-900 mt-3">
+          <div class="rounded-xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-900/20 p-4 text-emerald-900 dark:text-emerald-200 mt-3">
             <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-              <img src="tries.jpg" alt="Thuis bij Tries" class="img-card w-full sm:w-56 rounded-md border border-emerald-200 shadow"/>
+              <img src="tries.jpg" alt="Thuis bij Tries" class="img-card w-full sm:w-56 rounded-md border border-emerald-200 dark:border-emerald-800 shadow"/>
               <div class="flex-1">
                 <h5 class="font-semibold">Thuis bij Tries</h5>
                 <p class="text-sm">Warm, huiselijk en lokaal. ⭐ 4,7 (64 reviews)</p>
@@ -393,16 +409,16 @@
               </div>
             </div>
           </div>
-          <ul class="list-disc ms-5 mt-4 text-sm text-slate-700 space-y-1">
+          <ul class="list-disc ms-5 mt-4 text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li>Rechtsaf de Berkelseweg op.</li>
             <li>Op de Berkelseweg twee rotondes rechtdoor.</li>
             <li>Ga linksaf bij de Windas op Pluk van de Petteflatpad.</li>
           </ul>
-          <p class="inline-block mt-4 bg-amber-50 border border-amber-200 text-amber-900 px-3 py-1.5 rounded"><strong>Vraag 15:</strong> Noem 3 festivals die hier worden georganiseerd.</p>
+          <p class="inline-block mt-4 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-100 px-3 py-1.5 rounded"><strong>Vraag 15:</strong> Noem 3 festivals die hier worden georganiseerd.</p>
           <label class="block mt-3 text-sm">Jouw antwoord
-            <input id="vraag15" name="vraag15" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
+            <input id="vraag15" name="vraag15" type="text" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none" placeholder="Typ hier je antwoord" />
           </label>
-          <ul class="list-disc ms-5 mt-4 text-sm text-slate-700 space-y-1">
+          <ul class="list-disc ms-5 mt-4 text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li>Ga rechtsaf door het skatepark.</li>
             <li>Ga rechtsaf de brug over het fietspad op.</li>
             <li>Ga linksaf op Dominee van Koetsveldstraat.</li>
@@ -411,17 +427,19 @@
         </article>
       </div>
 
-      <div class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
-        <h3 class="text-lg font-semibold text-emerald-800">Bedankt voor jullie deelname!</h3>
+      <!-- Bedankje -->
+      <div class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+        <h3 class="text-lg font-semibold text-emerald-800 dark:text-emerald-400">Bedankt voor jullie deelname!</h3>
         <p class="mt-2">We hopen dat jullie hebben genoten van de fietstocht, de route en de gezellige stops. <span class="inline-block animate-bounce">🎉</span></p>
         <p class="mt-2">Maak er nog een heerlijke middag en avond van tijdens de BBQ en live muziek op het terras. Tot volgend jaar! 🙌</p>
       </div>
 
-      <div id="polls" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
-        <h3 class="text-lg font-semibold text-emerald-800">Geef je mening over de fietstocht</h3>
+      <!-- Polls -->
+      <div id="polls" class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+        <h3 class="text-lg font-semibold text-emerald-800 dark:text-emerald-400">Geef je mening over de fietstocht</h3>
         <div class="mt-4 grid md:grid-cols-2 gap-4">
           <label class="block text-sm">📅 Wat is jouw voorkeur voor de volgende editie?
-            <select id="poll1" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 focus:outline-none">
+            <select id="poll1" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none">
               <option value="">Maak een keuze</option>
               <option>Begin Juli</option>
               <option>Eind Juli</option>
@@ -430,7 +448,7 @@
             </select>
           </label>
           <label class="block text-sm">🗺️ Hoe vond je de route?
-            <select id="poll2" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 focus:outline-none">
+            <select id="poll2" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none">
               <option value="">Maak een keuze</option>
               <option>Beter dan verwacht</option>
               <option>Zoals verwacht</option>
@@ -438,7 +456,7 @@
             </select>
           </label>
           <label class="block text-sm">🌳 Wat voor soort route heeft je voorkeur?
-            <select id="poll3" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 focus:outline-none">
+            <select id="poll3" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none">
               <option value="">Maak een keuze</option>
               <option>Door de natuur, landelijke wegen</option>
               <option>Meer stedelijk, de stad in</option>
@@ -446,7 +464,7 @@
             </select>
           </label>
           <label class="block text-sm">📏 Hoe vond je de afstand?
-            <select id="poll4" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 focus:outline-none">
+            <select id="poll4" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none">
               <option value="">Maak een keuze</option>
               <option>Perfect zo</option>
               <option>Mag best wat langer</option>
@@ -456,8 +474,9 @@
         </div>
       </div>
 
-      <div id="verzenden" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 shadow-sm">
-        <h3 class="text-lg font-semibold text-emerald-800">Klaar? Verstuur je antwoorden</h3>
+      <!-- Share -->
+      <div id="verzenden" class="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+        <h3 class="text-lg font-semibold text-emerald-800 dark:text-emerald-400">Klaar? Verstuur je antwoorden</h3>
         <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Je antwoorden worden lokaal opgeslagen in je browser. Niks wordt automatisch gedeeld. Kies hieronder hoe je wilt versturen.</p>
         <div class="mt-4 flex flex-col sm:flex-row gap-3">
           <button id="btnWhatsApp" class="inline-flex items-center gap-2 rounded-lg bg-emerald-700 text-white px-4 py-2 font-medium shadow hover:bg-emerald-800"><i class="bi-whatsapp"></i> Stuur via WhatsApp</button>
@@ -467,17 +486,18 @@
     </section>
   </main>
 
+  <!-- Footer -->
   <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
     <div class="max-w-6xl mx-auto px-4 py-6 text-center text-sm text-slate-500 dark:text-slate-400">© 2025 Het Vierkantje</div>
   </footer>
 
-  <!-- Contact Dialog -->
-  <div id="contactDialog" class="hidden fixed inset-0 z-[100] flex items-center justify-center">
-    <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
-    <div class="relative w-full max-w-md rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl p-5">
+  <!-- Contact Dialog (re-usable) -->
+  <div id="contactDialog" class="hidden fixed inset-0 z-[100] flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="dlgTitle" aria-describedby="dlgDesc">
+    <div data-dialog-backdrop class="absolute inset-0 bg-slate-900/40"></div>
+    <div class="relative w-full max-w-md rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl p-5">
       <div class="flex items-center justify-between">
         <h4 id="dlgTitle" class="text-base font-semibold">Versturen</h4>
-        <button id="dlgClose" class="size-9 inline-flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"><i class="bi-x-lg"></i></button>
+        <button id="dlgClose" class="size-9 inline-flex items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800" aria-label="Sluit dialoog"><i class="bi-x-lg"></i></button>
       </div>
       <p id="dlgDesc" class="text-sm text-slate-600 dark:text-slate-300 mt-1"></p>
       <label class="block mt-4 text-sm" id="dlgLabel"></label>
@@ -488,103 +508,189 @@
     </div>
   </div>
 
+  <!-- Toast -->
   <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[110]">
     <div class="toast-enter rounded-full bg-slate-900 dark:bg-black text-white px-4 py-2 text-sm shadow-lg">Antwoorden opgeslagen</div>
   </div>
 
-  <!-- Mobile back-to-top FAB -->
-  <button id="fabTop" class="fixed bottom-4 right-4 md:hidden hidden rounded-full shadow-lg bg-emerald-700 text-white h-12 w-12 items-center justify-center"><i class="bi-arrow-up"></i></button>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.js"></script>
   <script>
+    // === Theme toggle ===
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      const root = document.documentElement;
+      const toDark = !root.classList.contains('dark');
+      root.classList.toggle('dark', toDark);
+      try { localStorage.setItem('theme', toDark ? 'dark' : 'light'); } catch(e) {}
+    });
+
+    // === Data mapping & persistence ===
     const vragen = [
-      'naam',
+      "naam",
       ...Array.from({ length: 15 }, (_, i) => `vraag${i + 1}`),
-      'poll1','poll2','poll3','poll4'
+      "poll1", "poll2", "poll3", "poll4"
     ];
     const vraagTeksten = {
-      naam: 'Naam', vraag1: 'Welk dier kom je op de route tegen?', vraag2: 'Hoe heette het verzorgingstehuis wat hier rechts van de weg stond?', vraag3: 'Hoeveel witte vlaggen hangen hier?', vraag4: 'Hoeveel volle badkuipen pompt het gemaal per minuut?', vraag5: 'Waar is de autocross?', vraag6: 'Wat voor dier staat in de voortuin aan de rechterkant?', vraag7: "Hoe groot is Cetti's zanger?", vraag8: 'Wie maken we hier blij?', vraag9: 'Wat is hier verboden?', vraag10: 'Hoe heet het huis?', vraag11: 'Hoe heet de IJsclub?', vraag12: 'Wat steekt er hier bovenuit?', vraag13: 'Welke collega van het Vierkantje zijn ouders wonen op deze weg?', vraag14: 'Je bestelt nr. 153 bij de chinees, wat krijg je?', vraag15: 'Noem 3 festivals die hier worden georganiseerd.', poll1: 'Zou je liever in juli fietsen dan in augustus?', poll2: 'Was de route zoals je had verwacht?', poll3: 'Zou je liever een route door de stad of natuur willen?', poll4: 'Moet de route volgend jaar korter of langer zijn?'
+      naam: "Naam",
+      vraag1: "Welk dier kom je op de route tegen?",
+      vraag2: "Hoe heette het verzorgingstehuis wat hier rechts van de weg stond?",
+      vraag3: "Hoeveel witte vlaggen hangen hier?",
+      vraag4: "Hoeveel volle badkuipen pompt het gemaal per minuut?",
+      vraag5: "Waar is de autocross?",
+      vraag6: "Wat voor dier staat in de voortuin aan de rechterkant?",
+      vraag7: "Hoe groot is Cetti's zanger?",
+      vraag8: "Wie maken we hier blij?",
+      vraag9: "Wat is hier verboden?",
+      vraag10: "Hoe heet het huis?",
+      vraag11: "Hoe heet de IJsclub?",
+      vraag12: "Wat steekt er hier bovenuit?",
+      vraag13: "Welke collega van het Vierkantje zijn ouders wonen op deze weg?",
+      vraag14: "Je bestelt nr. 153 bij de chinees, wat krijg je?",
+      vraag15: "Noem 3 festivals die hier worden georganiseerd.",
+      poll1: "Zou je liever in juli fietsen dan in augustus?",
+      poll2: "Was de route zoals je had verwacht?",
+      poll3: "Zou je liever een route door de stad of natuur willen?",
+      poll4: "Moet de route volgend jaar korter of langer zijn?"
     };
 
-    const toast = (msg = 'Antwoorden opgeslagen') => {
+    const toast = (msg = "Antwoorden opgeslagen") => {
       const el = document.getElementById('toast');
       el.firstElementChild.textContent = msg;
       el.classList.remove('hidden');
-      clearTimeout(el._t); el._t = setTimeout(()=>el.classList.add('hidden'), 1400);
+      clearTimeout(el._t);
+      el._t = setTimeout(() => el.classList.add('hidden'), 1400);
     };
 
-    // Persist inputs
+    // Initialize persisted values and listeners
     vragen.forEach(id => {
       const input = document.getElementById(id);
       if (!input) return;
       const saved = localStorage.getItem(id);
       if (saved !== null) input.value = saved;
-      input.addEventListener('input', () => { localStorage.setItem(id, input.value); updateProgress(); });
+      input.addEventListener('input', () => {
+        localStorage.setItem(id, input.value);
+      });
       input.addEventListener('change', () => toast());
     });
 
-    // Reset
+    // Reset stored values
     const resetBtn = document.getElementById('resetBtn');
-    if (resetBtn) resetBtn.addEventListener('click', () => {
-      if (!confirm('Weet je zeker dat je alle antwoorden wilt wissen?')) return;
-      vragen.forEach(id => localStorage.removeItem(id));
-      localStorage.removeItem('bierCount');
-      location.reload();
-    });
+    if (resetBtn) {
+      resetBtn.addEventListener('click', () => {
+        if (!confirm('Weet je zeker dat je alle antwoorden wilt wissen?')) return;
+        vragen.forEach(id => localStorage.removeItem(id));
+        localStorage.removeItem('bierCount');
+        location.reload();
+      });
+    }
 
-    // Bierteller
+    // === Bierteller ===
     let bierCount = parseInt(localStorage.getItem('bierCount') || '0', 10);
     const bierEl = document.getElementById('bierAantal');
     const bierPlus = document.getElementById('bierPlus');
     const plop = document.getElementById('plopGeluid');
-    const updateBier = () => { bierEl.textContent = bierCount; localStorage.setItem('bierCount', String(bierCount)); };
-    updateBier();
-    const reacties = { 1:"Op één been kan je niet lopen! 🍺", 3:"Ze smaken lekker zo te zien 🍻", 5:"Je moet ook nog terug hè? 😅", 8:"Misschien is het tijd voor een glas water? 💧😉", 10:"Als je nu nog recht fietst, trakteer je! 🚲", 12:"Je glas is voller dan je bandenspanning! 🎈", 14:"Niet vergeten: links = water, rechts = sloot 🌊", 16:"16 bruine boterhammen, wil jij zo nog wel BBQ-en? 🔥" };
-    bierPlus.addEventListener('click', () => { bierCount++; updateBier(); try{ if(plop){plop.currentTime=0; plop.play();} }catch(e){} if (reacties[bierCount]) alert(reacties[bierCount]); });
 
-    // Dialog
-    const dlg = { root: document.getElementById('contactDialog'), title: document.getElementById('dlgTitle'), desc: document.getElementById('dlgDesc'), label: document.getElementById('dlgLabel'), input: null, ok: document.getElementById('dlgOk'), cancel: document.getElementById('dlgCancel'), closeBtn: document.getElementById('dlgClose') };
+    const updateBier = () => {
+      bierEl.textContent = bierCount;
+      localStorage.setItem('bierCount', String(bierCount));
+    };
+    updateBier();
+
+    const reacties = {
+      1: "Op één been kan je niet lopen! 🍺",
+      3: "Ze smaken lekker zo te zien 🍻",
+      5: "Je moet ook nog terug hè? 😅",
+      8: "Misschien is het tijd voor een glas water? 💧😉",
+      10: "Als je nu nog recht fietst, trakteer je! 🚲",
+      12: "Je glas is voller dan je bandenspanning! 🎈",
+      14: "Niet vergeten: links = water, rechts = sloot 🌊",
+      16: "16 bruine boterhammen, wil jij zo nog wel BBQ-en? 🔥",
+    };
+
+    if (bierPlus) {
+      bierPlus.addEventListener('click', () => {
+        bierCount++;
+        updateBier();
+        try { if (plop) { plop.currentTime = 0; plop.play(); } } catch (e) {}
+        if (reacties[bierCount]) alert(reacties[bierCount]);
+      });
+    }
+
+    // === Dialog helper ===
+    const dlg = {
+      root: document.getElementById('contactDialog'),
+      title: document.getElementById('dlgTitle'),
+      desc: document.getElementById('dlgDesc'),
+      label: document.getElementById('dlgLabel'),
+      input: null,
+      ok: document.getElementById('dlgOk'),
+      cancel: document.getElementById('dlgCancel'),
+      closeBtn: document.getElementById('dlgClose')
+    };
     const openDialog = (opts) => {
-      dlg.title.textContent = opts.title; dlg.desc.textContent = opts.desc; dlg.label.innerHTML = `${opts.label}<input id="dlgInput" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-2 focus:outline-none" placeholder="${opts.placeholder}" inputmode="${opts.inputmode||'text'}" />`;
-      dlg.input = document.getElementById('dlgInput'); dlg.ok.onclick = () => opts.onOk?.(dlg.input.value); dlg.cancel.onclick = dlg.closeBtn.onclick = closeDialog; dlg.root.classList.remove('hidden'); dlg.input.focus();
+      dlg.title.textContent = opts.title;
+      dlg.desc.textContent = opts.desc;
+      dlg.label.textContent = opts.label;
+      dlg.label.innerHTML = `${opts.label}<input id="dlgInput" class="pro-input mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 focus:outline-none" placeholder="${opts.placeholder}" inputmode="${opts.inputmode||'text'}" />`;
+      dlg.input = document.getElementById('dlgInput');
+      dlg.ok.onclick = () => opts.onOk?.(dlg.input.value);
+      dlg.cancel.onclick = dlg.closeBtn.onclick = closeDialog;
+      dlg.root.classList.remove('hidden');
+      dlg.input.focus();
     };
     const closeDialog = () => dlg.root.classList.add('hidden');
 
-    function assembleTextForShare(encodedFor = 'wa'){
-      let tekst = encodedFor==='wa' ? 'Mijn antwoorden voor de Fietstocht 2025:%0A%0A' : 'Mijn antwoorden voor de Fietstocht 2025:\n\n';
-      vragen.forEach(id => { const vraag = vraagTeksten[id] || id; const value = localStorage.getItem(id) || '-'; if (encodedFor==='wa') { tekst += `${encodeURIComponent(vraag)}: ${encodeURIComponent(value)}%0A`; } else { tekst += `${vraag}: ${value}\n`; } });
+    // === Share ===
+    function assembleTextForShare(encodedFor = 'wa') {
+      let tekst = encodedFor === 'wa' ? 'Mijn antwoorden voor de Fietstocht 2025:%0A%0A' : 'Mijn antwoorden voor de Fietstocht 2025:\n\n';
+      vragen.forEach(id => {
+        const vraag = vraagTeksten[id] || id;
+        const value = localStorage.getItem(id) || '-';
+        if (encodedFor === 'wa') {
+          tekst += `${encodeURIComponent(vraag)}: ${encodeURIComponent(value)}%0A`;
+        } else {
+          tekst += `${vraag}: ${value}\n`;
+        }
+      });
       return tekst;
     }
 
     document.getElementById('btnWhatsApp').addEventListener('click', () => {
-      openDialog({ title:'Versturen via WhatsApp', desc:'Voer het WhatsApp-nummer in, bijvoorbeeld 31612345678 (zonder plus en spaties).', label:'WhatsApp‑nummer', placeholder:'31612345678', inputmode:'numeric', onOk:(nummer)=>{ if(!nummer) return closeDialog(); const digits = nummer.replace(/\D/g,''); if(!/^\d{8,15}$/.test(digits)){ alert('Voer een geldig nummer in.'); return; } const whatsappURL = `https://wa.me/${digits}?text=${assembleTextForShare('wa')}`; window.open(whatsappURL, '_blank'); closeDialog(); }});
+      openDialog({
+        title: 'Versturen via WhatsApp',
+        desc: 'Voer het WhatsApp-nummer in, bijvoorbeeld 31612345678 (zonder plus en spaties).',
+        label: 'WhatsApp‑nummer',
+        placeholder: '31612345678',
+        inputmode: 'numeric',
+        onOk: (nummer) => {
+          if (!nummer) return closeDialog();
+          const digits = nummer.replace(/\D/g, '');
+          if (!/^\d{8,15}$/.test(digits)) { alert('Voer een geldig nummer in.'); return; }
+          const whatsappURL = `https://wa.me/${digits}?text=${assembleTextForShare('wa')}`;
+          window.open(whatsappURL, '_blank');
+          closeDialog();
+        }
+      });
     });
 
     document.getElementById('btnMail').addEventListener('click', () => {
-      openDialog({ title:'Versturen via e‑mail', desc:'Voer het e‑mailadres van de ontvanger in.', label:'E‑mailadres', placeholder:'naam@voorbeeld.nl', inputmode:'email', onOk:(email)=>{ if(!email) return closeDialog(); const ok = /.+@.+\..+/.test(email); if(!ok){ alert('Voer een geldig e‑mailadres in.'); return; } const body = encodeURIComponent(assembleTextForShare('mail')); const mailto = `mailto:${email}?subject=${encodeURIComponent('Fietstocht 2025 Antwoorden')}&body=${body}`; window.location.href = mailto; closeDialog(); }});
+      openDialog({
+        title: 'Versturen via e‑mail',
+        desc: 'Voer het e‑mailadres van de ontvanger in.',
+        label: 'E‑mailadres',
+        placeholder: 'naam@voorbeeld.nl',
+        inputmode: 'email',
+        onOk: (email) => {
+          if (!email) return closeDialog();
+          const ok = /.+@.+\..+/.test(email);
+          if (!ok) { alert('Voer een geldig e‑mailadres in.'); return; }
+          const body = encodeURIComponent(assembleTextForShare('mail'));
+          const mailto = `mailto:${email}?subject=${encodeURIComponent('Fietstocht 2025 Antwoorden')}&body=${body}`;
+          window.location.href = mailto;
+          closeDialog();
+        }
+      });
     });
 
-    // Theme toggle
-    document.getElementById('themeToggle').addEventListener('click', () => {
-      const isDark = document.documentElement.classList.toggle('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    });
-
-    // Progress bar
-    const progressBar = document.getElementById('progressBar');
-    function updateProgress(){
-      const filled = vragen.filter(id => (localStorage.getItem(id)||'').trim().length > 0).length;
-      const pct = Math.round((filled / vragen.length) * 100);
-      progressBar.style.width = pct + '%';
-    }
-    updateProgress();
-
-    // FAB back to top
-    const fab = document.getElementById('fabTop');
-    window.addEventListener('scroll', () => { if (window.scrollY > 320) { fab.classList.remove('hidden'); fab.classList.add('flex'); } else { fab.classList.add('hidden'); fab.classList.remove('flex'); } });
-    fab.addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
-
-    // Utility
+    // Utilities
     document.getElementById('scrollTop').addEventListener('click', () => window.scrollTo({top:0, behavior:'smooth'}));
   </script>
 </body>
